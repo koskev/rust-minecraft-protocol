@@ -78,7 +78,7 @@ impl<W: Write> EncoderWriteExt for W {
     }
 
     fn write_compound_tag(&mut self, value: &CompoundTag) -> Result<(), EncodeError> {
-        nbt::encode::write_compound_tag(self, value.clone())?;
+        nbt::encode::write_compound_tag(self, &value)?;
 
         Ok(())
     }
