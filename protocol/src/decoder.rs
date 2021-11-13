@@ -222,6 +222,22 @@ impl Decoder for Vec<CompoundTag> {
     }
 }
 
+impl Decoder for Vec<String> {
+    type Output = Self;
+
+    fn decode<R: Read>(reader: &mut R) -> Result<Self::Output, DecodeError> {
+        let length = reader.read_var_i32()? as usize;
+        let mut vec = Vec::with_capacity(length);
+
+        for _ in 0..length {
+            let identifier = reader.read_string(32767)?;
+            vec.push(identifier);
+        }
+
+        Ok(vec)
+    }
+}
+
 pub mod var_int {
     use crate::decoder::DecoderReadExt;
     use crate::error::DecodeError;
@@ -261,8 +277,17 @@ pub mod uuid_hyp_str {
     use uuid::Uuid;
 
     pub fn decode<R: Read>(reader: &mut R) -> Result<Uuid, DecodeError> {
-        let uuid_hyphenated_string = reader.read_string(36)?;
-        let uuid = Uuid::parse_str(&uuid_hyphenated_string)?;
+        // TODO(timvisee): use custom encoder for this, rather than putting this in uuid_hyp_str
+
+        let data = [reader.read_var_i64()?, reader.read_var_i64()?];
+
+        // TODO(timvisee): remove unsafe
+        let raw = unsafe { std::mem::transmute(data) };
+
+        let uuid = Uuid::from_bytes(raw);
+
+        // let uuid_hyphenated_string = reader.read_string(36)?;
+        // let uuid = Uuid::parse_str(&uuid_hyphenated_string)?;
 
         Ok(uuid)
     }

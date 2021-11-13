@@ -183,7 +183,7 @@ impl Encoder for Vec<CompoundTag> {
     }
 }
 
-// TODO: identifier encoder, we might want a custom type
+// TODO(timvisee): identifier encoder, we might want a custom type
 impl Encoder for Vec<String> {
     fn encode<W: Write>(&self, writer: &mut W) -> Result<(), EncodeError> {
         writer.write_var_i32(self.len() as i32)?;
@@ -195,19 +195,6 @@ impl Encoder for Vec<String> {
         Ok(())
     }
 }
-
-// TODO: BitSet encoder, implement this
-// TODO: impl Encoder for Vec<i64> {
-// TODO:     fn encode<W: Write>(&self, writer: &mut W) -> Result<(), EncodeError> {
-// TODO:         writer.write_var_i32(self.len() as i32)?;
-
-// TODO:         for mask in self {
-// TODO:             writer.write_i64::<BigEndian>(*mask)?
-// TODO:         }
-
-// TODO:         Ok(())
-// TODO:     }
-// TODO: }
 
 pub mod var_int {
     use crate::encoder::EncoderWriteExt;
@@ -251,7 +238,7 @@ pub mod uuid_hyp_str {
     use uuid::{Uuid, Version};
 
     pub fn encode<W: Write>(value: &Uuid, writer: &mut W) -> Result<(), EncodeError> {
-        // TODO: use custom encoder for this, rather than putting this in uuid_hyp_str
+        // TODO(timvisee): use custom encoder for this, rather than putting this in uuid_hyp_str
         match value.get_version() {
             Some(Version::Md5) => {
                 writer.write_all(value.as_bytes())?;
