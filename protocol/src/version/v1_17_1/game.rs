@@ -29,6 +29,7 @@ pub enum GameClientBoundPacket {
     EntityAction(EntityAction),
 
     PluginMessage(PluginMessage),
+    NamedSoundEffect(NamedSoundEffect),
     Respawn(Respawn),
     PlayerPositionAndLook(PlayerPositionAndLook),
     SpawnPosition(SpawnPosition),
@@ -80,6 +81,7 @@ impl GameClientBoundPacket {
         match self {
             GameClientBoundPacket::ClientBoundChatMessage(_) => 0x0E,
             GameClientBoundPacket::PluginMessage(_) => 0x18,
+            GameClientBoundPacket::NamedSoundEffect(_) => 0x19,
             GameClientBoundPacket::GameDisconnect(_) => 0x1A,
             GameClientBoundPacket::ClientBoundKeepAlive(_) => 0x20,
             GameClientBoundPacket::ChunkData(_) => 0x21,
@@ -107,6 +109,11 @@ impl GameClientBoundPacket {
                 let plugin_message = PluginMessage::decode(reader)?;
 
                 Ok(GameClientBoundPacket::PluginMessage(plugin_message))
+            }
+            0x19 => {
+                let named_sound_effect = NamedSoundEffect::decode(reader)?;
+
+                Ok(GameClientBoundPacket::NamedSoundEffect(named_sound_effect))
             }
             0x1A => {
                 let game_disconnect = GameDisconnect::decode(reader)?;
@@ -176,6 +183,24 @@ pub struct PluginMessage {
     #[data_type(max_length = 32767)]
     pub channel: String,
     pub data: Vec<u8>,
+}
+
+// TODO(timvisee): implement new()
+// TODO(timvisee): remove clone?
+#[derive(Clone, Encoder, Decoder, Debug)]
+pub struct NamedSoundEffect {
+    #[data_type(max_length = 32767)]
+    pub sound_name: String,
+    #[data_type(with = "var_int")]
+    pub sound_category: i32,
+    // Mulitplied by 8
+    pub effect_pos_x: i32,
+    // Mulitplied by 8
+    pub effect_pos_y: i32,
+    // Mulitplied by 8
+    pub effect_pos_z: i32,
+    pub volume: f32,
+    pub pitch: f32,
 }
 
 // TODO(timvisee): implement new()
