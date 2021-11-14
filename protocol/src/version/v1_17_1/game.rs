@@ -14,6 +14,7 @@ pub use super::super::v1_14_4::game::{
 
 pub enum GameServerBoundPacket {
     ServerBoundChatMessage(ServerBoundChatMessage),
+    PluginMessage(PluginMessage),
     ServerBoundKeepAlive(ServerBoundKeepAlive),
     ServerBoundAbilities(ServerBoundAbilities),
 }
@@ -27,6 +28,7 @@ pub enum GameClientBoundPacket {
     BossBar(BossBar),
     EntityAction(EntityAction),
 
+    PluginMessage(PluginMessage),
     Respawn(Respawn),
     PlayerPositionAndLook(PlayerPositionAndLook),
     SpawnPosition(SpawnPosition),
@@ -40,6 +42,7 @@ impl GameServerBoundPacket {
     pub fn get_type_id(&self) -> u8 {
         match self {
             GameServerBoundPacket::ServerBoundChatMessage(_) => 0x03,
+            GameServerBoundPacket::PluginMessage(_) => 0x0A,
             GameServerBoundPacket::ServerBoundKeepAlive(_) => 0x0F,
             GameServerBoundPacket::ServerBoundAbilities(_) => 0x19,
         }
@@ -52,10 +55,20 @@ impl GameServerBoundPacket {
 
                 Ok(GameServerBoundPacket::ServerBoundChatMessage(chat_message))
             }
+            0x0A => {
+                let plugin_message = PluginMessage::decode(reader)?;
+
+                Ok(GameServerBoundPacket::PluginMessage(plugin_message))
+            }
             0x0F => {
                 let keep_alive = ServerBoundKeepAlive::decode(reader)?;
 
                 Ok(GameServerBoundPacket::ServerBoundKeepAlive(keep_alive))
+            }
+            0x19 => {
+                let abilities = ServerBoundAbilities::decode(reader)?;
+
+                Ok(GameServerBoundPacket::ServerBoundAbilities(abilities))
             }
             _ => Err(DecodeError::UnknownPacketType { type_id }),
         }
@@ -66,6 +79,7 @@ impl GameClientBoundPacket {
     pub fn get_type_id(&self) -> u8 {
         match self {
             GameClientBoundPacket::ClientBoundChatMessage(_) => 0x0E,
+            GameClientBoundPacket::PluginMessage(_) => 0x18,
             GameClientBoundPacket::GameDisconnect(_) => 0x1A,
             GameClientBoundPacket::ClientBoundKeepAlive(_) => 0x20,
             GameClientBoundPacket::ChunkData(_) => 0x21,
@@ -88,6 +102,11 @@ impl GameClientBoundPacket {
                 let chat_message = ClientBoundChatMessage::decode(reader)?;
 
                 Ok(GameClientBoundPacket::ClientBoundChatMessage(chat_message))
+            }
+            0x18 => {
+                let plugin_message = PluginMessage::decode(reader)?;
+
+                Ok(GameClientBoundPacket::PluginMessage(plugin_message))
             }
             0x1A => {
                 let game_disconnect = GameDisconnect::decode(reader)?;
@@ -152,6 +171,14 @@ impl GameClientBoundPacket {
 }
 
 // TODO(timvisee): implement new()
+#[derive(Encoder, Decoder, Debug)]
+pub struct PluginMessage {
+    #[data_type(max_length = 32767)]
+    pub channel: String,
+    pub data: Vec<u8>,
+}
+
+// TODO(timvisee): implement new()
 // TODO(timvisee): remove clone?
 #[derive(Clone, Encoder, Decoder, Debug)]
 pub struct JoinGame {
@@ -159,9 +186,11 @@ pub struct JoinGame {
     pub hardcore: bool,
     pub game_mode: u8,
     pub previous_game_mode: u8,
+    // TODO: max string length: 32767
     pub world_names: Vec<String>,
     pub dimension_codec: CompoundTag,
     pub dimension: CompoundTag,
+    #[data_type(max_length = 32767)]
     pub world_name: String,
     pub hashed_seed: i64,
     #[data_type(with = "var_int")]
@@ -178,6 +207,7 @@ pub struct JoinGame {
 #[derive(Encoder, Decoder, Debug)]
 pub struct Respawn {
     pub dimension: CompoundTag,
+    #[data_type(max_length = 32767)]
     pub world_name: String,
     pub hashed_seed: i64,
     pub game_mode: u8,
