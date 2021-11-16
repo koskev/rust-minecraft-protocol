@@ -1,6 +1,7 @@
 use crate::data::chat::Message;
 use crate::decoder::Decoder;
 use crate::error::DecodeError;
+use crate::{trait_packet_id, version::PacketId};
 use minecraft_protocol_derive::Decoder;
 use minecraft_protocol_derive::Encoder;
 use nbt::CompoundTag;
@@ -14,7 +15,7 @@ pub use super::super::v1_14_4::game::{
 
 pub enum GameServerBoundPacket {
     ServerBoundChatMessage(ServerBoundChatMessage),
-    PluginMessage(PluginMessage),
+    ServerBoundPluginMessage(ServerBoundPluginMessage),
     ServerBoundKeepAlive(ServerBoundKeepAlive),
     ServerBoundAbilities(ServerBoundAbilities),
 }
@@ -28,7 +29,7 @@ pub enum GameClientBoundPacket {
     BossBar(BossBar),
     EntityAction(EntityAction),
 
-    PluginMessage(PluginMessage),
+    ClientBoundPluginMessage(ClientBoundPluginMessage),
     NamedSoundEffect(NamedSoundEffect),
     Respawn(Respawn),
     PlayerPositionAndLook(PlayerPositionAndLook),
@@ -43,7 +44,7 @@ impl GameServerBoundPacket {
     pub fn get_type_id(&self) -> u8 {
         match self {
             GameServerBoundPacket::ServerBoundChatMessage(_) => 0x03,
-            GameServerBoundPacket::PluginMessage(_) => 0x0A,
+            GameServerBoundPacket::ServerBoundPluginMessage(_) => 0x0A,
             GameServerBoundPacket::ServerBoundKeepAlive(_) => 0x0F,
             GameServerBoundPacket::ServerBoundAbilities(_) => 0x19,
         }
@@ -57,9 +58,11 @@ impl GameServerBoundPacket {
                 Ok(GameServerBoundPacket::ServerBoundChatMessage(chat_message))
             }
             0x0A => {
-                let plugin_message = PluginMessage::decode(reader)?;
+                let plugin_message = ServerBoundPluginMessage::decode(reader)?;
 
-                Ok(GameServerBoundPacket::PluginMessage(plugin_message))
+                Ok(GameServerBoundPacket::ServerBoundPluginMessage(
+                    plugin_message,
+                ))
             }
             0x0F => {
                 let keep_alive = ServerBoundKeepAlive::decode(reader)?;
@@ -80,7 +83,7 @@ impl GameClientBoundPacket {
     pub fn get_type_id(&self) -> u8 {
         match self {
             GameClientBoundPacket::ClientBoundChatMessage(_) => 0x0E,
-            GameClientBoundPacket::PluginMessage(_) => 0x18,
+            GameClientBoundPacket::ClientBoundPluginMessage(_) => 0x18,
             GameClientBoundPacket::NamedSoundEffect(_) => 0x19,
             GameClientBoundPacket::GameDisconnect(_) => 0x1A,
             GameClientBoundPacket::ClientBoundKeepAlive(_) => 0x20,
@@ -106,9 +109,11 @@ impl GameClientBoundPacket {
                 Ok(GameClientBoundPacket::ClientBoundChatMessage(chat_message))
             }
             0x18 => {
-                let plugin_message = PluginMessage::decode(reader)?;
+                let plugin_message = ClientBoundPluginMessage::decode(reader)?;
 
-                Ok(GameClientBoundPacket::PluginMessage(plugin_message))
+                Ok(GameClientBoundPacket::ClientBoundPluginMessage(
+                    plugin_message,
+                ))
             }
             0x19 => {
                 let named_sound_effect = NamedSoundEffect::decode(reader)?;
@@ -179,7 +184,15 @@ impl GameClientBoundPacket {
 
 // TODO(timvisee): implement new()
 #[derive(Encoder, Decoder, Debug)]
-pub struct PluginMessage {
+pub struct ServerBoundPluginMessage {
+    #[data_type(max_length = 32767)]
+    pub channel: String,
+    pub data: Vec<u8>,
+}
+
+// TODO(timvisee): implement new()
+#[derive(Encoder, Decoder, Debug)]
+pub struct ClientBoundPluginMessage {
     #[data_type(max_length = 32767)]
     pub channel: String,
     pub data: Vec<u8>,
@@ -285,3 +298,16 @@ pub struct SpawnPosition {
     pub position: u64,
     pub angle: f32,
 }
+
+trait_packet_id!(ServerBoundPluginMessage, 0x0A);
+
+trait_packet_id!(ClientBoundPluginMessage, 0x18);
+trait_packet_id!(NamedSoundEffect, 0x19);
+trait_packet_id!(JoinGame, 0x25);
+trait_packet_id!(PlayerPositionAndLook, 0x38);
+trait_packet_id!(Respawn, 0x3D);
+trait_packet_id!(SpawnPosition, 0x4B);
+trait_packet_id!(SetTitleSubtitle, 0x57);
+trait_packet_id!(TimeUpdate, 0x58);
+trait_packet_id!(SetTitleText, 0x59);
+trait_packet_id!(SetTitleTimes, 0x5A);

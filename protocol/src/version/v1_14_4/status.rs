@@ -1,11 +1,12 @@
 use crate::data::server_status::*;
 use crate::decoder::Decoder;
 use crate::error::DecodeError;
+use crate::{trait_packet_id, version::PacketId};
 use minecraft_protocol_derive::{Decoder, Encoder};
 use std::io::Read;
 
 pub enum StatusServerBoundPacket {
-    StatusRequest,
+    StatusRequest(StatusRequest),
     PingRequest(PingRequest),
 }
 
@@ -17,14 +18,14 @@ pub enum StatusClientBoundPacket {
 impl StatusServerBoundPacket {
     pub fn get_type_id(&self) -> u8 {
         match self {
-            StatusServerBoundPacket::StatusRequest => 0x00,
+            StatusServerBoundPacket::StatusRequest(_) => 0x00,
             StatusServerBoundPacket::PingRequest(_) => 0x01,
         }
     }
 
     pub fn decode<R: Read>(type_id: u8, reader: &mut R) -> Result<Self, DecodeError> {
         match type_id {
-            0x00 => Ok(StatusServerBoundPacket::StatusRequest),
+            0x00 => Ok(StatusServerBoundPacket::StatusRequest(StatusRequest {})),
             0x01 => {
                 let ping_request = PingRequest::decode(reader)?;
 
@@ -67,6 +68,15 @@ impl PingResponse {
         let ping_response = PingResponse { time };
 
         StatusClientBoundPacket::PingResponse(ping_response)
+    }
+}
+
+#[derive(Encoder, Decoder, Debug)]
+pub struct StatusRequest {}
+
+impl StatusRequest {
+    pub fn new() -> StatusServerBoundPacket {
+        StatusServerBoundPacket::StatusRequest(StatusRequest {})
     }
 }
 
@@ -198,3 +208,9 @@ mod tests {
         );
     }
 }
+
+trait_packet_id!(StatusRequest, 0x00);
+trait_packet_id!(PingRequest, 0x01);
+
+trait_packet_id!(StatusResponse, 0x00);
+trait_packet_id!(PingResponse, 0x01);
