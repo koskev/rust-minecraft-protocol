@@ -55,11 +55,11 @@ impl GameServerBoundPacket {
 impl GameClientBoundPacket {
     pub fn get_type_id(&self) -> u8 {
         match self {
-            GameClientBoundPacket::ClientBoundChatMessage(_) => 0x0E,
+            GameClientBoundPacket::ClientBoundChatMessage(_) => 0x0F,
             GameClientBoundPacket::GameDisconnect(_) => 0x1A,
             GameClientBoundPacket::ClientBoundKeepAlive(_) => 0x20,
             GameClientBoundPacket::ChunkData(_) => 0x21,
-            GameClientBoundPacket::JoinGame(_) => 0x25,
+            GameClientBoundPacket::JoinGame(_) => 0x26,
             GameClientBoundPacket::BossBar(_) => 0x0D,
             GameClientBoundPacket::EntityAction(_) => 0x1B,
         }
@@ -738,9 +738,9 @@ trait_packet_id!(ServerBoundChatMessage, 0x03);
 trait_packet_id!(ServerBoundKeepAlive, 0x0F);
 trait_packet_id!(ServerBoundAbilities, 0x19);
 
-trait_packet_id!(ClientBoundChatMessage, 0x0E);
+trait_packet_id!(ClientBoundChatMessage, 0x0F);
 trait_packet_id!(GameDisconnect, 0x1A);
-trait_packet_id!(ClientBoundKeepAlive, 0x20);
+trait_packet_id!(ClientBoundKeepAlive, 0x21);
 trait_packet_id!(ChunkData, 0x21);
 trait_packet_id!(JoinGame, 0x25);
 trait_packet_id!(BossBar, 0x0D);

@@ -303,7 +303,7 @@ trait_packet_id!(ServerBoundPluginMessage, 0x0A);
 
 trait_packet_id!(ClientBoundPluginMessage, 0x18);
 trait_packet_id!(NamedSoundEffect, 0x19);
-trait_packet_id!(JoinGame, 0x25);
+trait_packet_id!(JoinGame, 0x26);
 trait_packet_id!(PlayerPositionAndLook, 0x38);
 trait_packet_id!(Respawn, 0x3D);
 trait_packet_id!(SpawnPosition, 0x4B);
