@@ -8,6 +8,7 @@ pub struct ServerStatus {
     pub version: ServerVersion,
     pub players: OnlinePlayers,
     pub description: Message,
+    pub favicon: Option<String>,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
