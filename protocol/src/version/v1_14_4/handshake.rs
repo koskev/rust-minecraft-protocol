@@ -26,7 +26,7 @@ impl HandshakeServerBoundPacket {
     }
 }
 
-#[derive(Encoder, Decoder, Debug)]
+#[derive(Clone, Encoder, Decoder, Debug)]
 pub struct Handshake {
     #[data_type(with = "var_int")]
     pub protocol_version: i32,
