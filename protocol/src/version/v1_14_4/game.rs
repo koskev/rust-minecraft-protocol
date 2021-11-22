@@ -3,12 +3,24 @@ use crate::decoder::Decoder;
 use crate::decoder::DecoderReadExt;
 use crate::encoder::EncoderWriteExt;
 use crate::error::DecodeError;
-use crate::{trait_packet_id, version::PacketId};
+use crate::{set_packet_id, version::PacketId};
 use byteorder::{ReadBytesExt, WriteBytesExt};
 use minecraft_protocol_derive::{Decoder, Encoder};
 use nbt::CompoundTag;
 use std::io::Read;
 use uuid::Uuid;
+
+set_packet_id!(ServerBoundChatMessage, 0x03);
+set_packet_id!(ServerBoundKeepAlive, 0x0F);
+set_packet_id!(ServerBoundAbilities, 0x19);
+
+set_packet_id!(ClientBoundChatMessage, 0x0F);
+set_packet_id!(GameDisconnect, 0x1A);
+set_packet_id!(ClientBoundKeepAlive, 0x21);
+set_packet_id!(ChunkData, 0x21);
+set_packet_id!(JoinGame, 0x25);
+set_packet_id!(BossBar, 0x0D);
+set_packet_id!(EntityAction, 0x1B);
 
 pub enum GameServerBoundPacket {
     ServerBoundChatMessage(ServerBoundChatMessage),
@@ -191,7 +203,7 @@ impl ServerBoundKeepAlive {
     }
 }
 
-#[derive(Encoder, Decoder)]
+#[derive(Encoder, Decoder, Debug)]
 pub struct ClientBoundKeepAlive {
     pub id: u64,
 }
@@ -733,15 +745,3 @@ mod tests {
         assert!(abilities.creative_mode);
     }
 }
-
-trait_packet_id!(ServerBoundChatMessage, 0x03);
-trait_packet_id!(ServerBoundKeepAlive, 0x0F);
-trait_packet_id!(ServerBoundAbilities, 0x19);
-
-trait_packet_id!(ClientBoundChatMessage, 0x0F);
-trait_packet_id!(GameDisconnect, 0x1A);
-trait_packet_id!(ClientBoundKeepAlive, 0x21);
-trait_packet_id!(ChunkData, 0x21);
-trait_packet_id!(JoinGame, 0x25);
-trait_packet_id!(BossBar, 0x0D);
-trait_packet_id!(EntityAction, 0x1B);

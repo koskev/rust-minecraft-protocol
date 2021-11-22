@@ -1,8 +1,10 @@
 use crate::decoder::Decoder;
 use crate::error::DecodeError;
-use crate::{trait_packet_id, version::PacketId};
+use crate::{set_packet_id, version::PacketId};
 use minecraft_protocol_derive::{Decoder, Encoder};
 use std::io::Read;
+
+set_packet_id!(Handshake, 0x00);
 
 pub enum HandshakeServerBoundPacket {
     Handshake(Handshake),
@@ -54,5 +56,3 @@ impl Handshake {
         HandshakeServerBoundPacket::Handshake(handshake)
     }
 }
-
-trait_packet_id!(Handshake, 0x00);

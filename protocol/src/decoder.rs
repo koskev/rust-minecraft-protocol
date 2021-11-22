@@ -222,6 +222,7 @@ impl Decoder for Vec<CompoundTag> {
     }
 }
 
+// TODO(timvisee): identifier decoder, we might want a custom type
 impl Decoder for Vec<String> {
     type Output = Self;
 

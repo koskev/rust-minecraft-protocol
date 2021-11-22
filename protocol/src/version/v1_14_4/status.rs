@@ -1,9 +1,15 @@
 use crate::data::server_status::*;
 use crate::decoder::Decoder;
 use crate::error::DecodeError;
-use crate::{trait_packet_id, version::PacketId};
+use crate::{set_packet_id, version::PacketId};
 use minecraft_protocol_derive::{Decoder, Encoder};
 use std::io::Read;
+
+set_packet_id!(StatusRequest, 0x00);
+set_packet_id!(PingRequest, 0x01);
+
+set_packet_id!(StatusResponse, 0x00);
+set_packet_id!(PingResponse, 0x01);
 
 pub enum StatusServerBoundPacket {
     StatusRequest(StatusRequest),
@@ -208,9 +214,3 @@ mod tests {
         );
     }
 }
-
-trait_packet_id!(StatusRequest, 0x00);
-trait_packet_id!(PingRequest, 0x01);
-
-trait_packet_id!(StatusResponse, 0x00);
-trait_packet_id!(PingResponse, 0x01);

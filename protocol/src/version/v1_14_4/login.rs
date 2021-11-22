@@ -4,8 +4,18 @@ use uuid::Uuid;
 use crate::data::chat::Message;
 use crate::decoder::Decoder;
 use crate::error::DecodeError;
-use crate::{trait_packet_id, version::PacketId};
+use crate::{set_packet_id, version::PacketId};
 use minecraft_protocol_derive::{Decoder, Encoder};
+
+set_packet_id!(LoginStart, 0x00);
+set_packet_id!(EncryptionResponse, 0x01);
+set_packet_id!(LoginPluginResponse, 0x02);
+
+set_packet_id!(LoginDisconnect, 0x00);
+set_packet_id!(EncryptionRequest, 0x01);
+set_packet_id!(LoginSuccess, 0x02);
+set_packet_id!(SetCompression, 0x03);
+set_packet_id!(LoginPluginRequest, 0x04);
 
 pub enum LoginServerBoundPacket {
     LoginStart(LoginStart),
@@ -481,13 +491,3 @@ mod tests {
         );
     }
 }
-
-trait_packet_id!(LoginStart, 0x00);
-trait_packet_id!(EncryptionResponse, 0x01);
-trait_packet_id!(LoginPluginResponse, 0x02);
-
-trait_packet_id!(LoginDisconnect, 0x00);
-trait_packet_id!(EncryptionRequest, 0x01);
-trait_packet_id!(LoginSuccess, 0x02);
-trait_packet_id!(SetCompression, 0x03);
-trait_packet_id!(LoginPluginRequest, 0x04);
