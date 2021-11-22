@@ -239,6 +239,24 @@ impl Decoder for Vec<String> {
     }
 }
 
+// TODO(timvisee): forge mod channel decoder, we might want a custom type
+impl Decoder for Vec<(String, String)> {
+    type Output = Self;
+
+    fn decode<R: Read>(reader: &mut R) -> Result<Self::Output, DecodeError> {
+        let length = reader.read_var_i32()? as usize;
+        let mut vec = Vec::with_capacity(length);
+
+        for _ in 0..length {
+            let a = reader.read_string(32767)?;
+            let b = reader.read_string(32767)?;
+            vec.push((a, b));
+        }
+
+        Ok(vec)
+    }
+}
+
 pub mod var_int {
     use crate::decoder::DecoderReadExt;
     use crate::error::DecodeError;

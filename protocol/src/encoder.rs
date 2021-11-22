@@ -196,6 +196,20 @@ impl Encoder for Vec<String> {
     }
 }
 
+// TODO(timvisee): forge mod channel encoder, we might want a custom type
+impl Encoder for Vec<(String, String)> {
+    fn encode<W: Write>(&self, writer: &mut W) -> Result<(), EncodeError> {
+        writer.write_var_i32(self.len() as i32)?;
+
+        for (a, b) in self {
+            writer.write_string(&a, 32767)?;
+            writer.write_string(&b, 32767)?;
+        }
+
+        Ok(())
+    }
+}
+
 pub mod var_int {
     use crate::encoder::EncoderWriteExt;
     use crate::error::EncodeError;
