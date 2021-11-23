@@ -1,4 +1,4 @@
-// Spec: https://wiki.vg/index.php?title=Protocol&oldid=16681
+// Spec: https://wiki.vg/index.php?title=Protocol&oldid=16317
 
 pub mod game;
 
