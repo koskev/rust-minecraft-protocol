@@ -14,7 +14,7 @@ pub trait PacketId {
 macro_rules! set_packet_id (
     ($type: ident, $id: expr) => (
         impl $type {
-            const PACKET_ID: u8 = $id;
+            pub const PACKET_ID: u8 = $id;
         }
 
         impl PacketId for $type {
