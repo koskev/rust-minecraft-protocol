@@ -303,7 +303,8 @@ pub struct Message {
     pub hover_event: Option<HoverEvent>,
     #[serde(flatten)]
     pub payload: Payload,
-    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    //#[serde(skip_serializing_if = "Vec::is_empty", default)]
+    #[serde(skip)]
     pub extra: Vec<Message>,
 }
 
